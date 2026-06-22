@@ -1,0 +1,12 @@
+fastapi==0.135.1
+uvicorn==0.46.0
+Jinja2==3.1.6
+pydantic==2.11.9
+openpyxl==3.1.5
+pyodbc==5.3.0
+aioodbc==0.5.0
+redis==6.4.0
+PyJWT==2.12.1
+bcrypt==5.0.0
+openai==1.107.3
+tqdm==4.67.1
