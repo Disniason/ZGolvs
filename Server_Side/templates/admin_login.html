@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 背单词系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2fee2f 0%, #32ac06 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-group input {
+            flex: 1;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-code {
+            background: #4CAF50;
+            white-space: nowrap;
+        }
+        
+        .btn-code:hover:not(:disabled) {
+            background: #45a049;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .separator {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .separator span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .register-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔐 登录系统</h2>
+        
+        <div class="tab-buttons">
+            <button id="btn-pwd" class="tab-btn active">密码登录</button>
+            <button id="btn-code" class="tab-btn">验证码登录</button>
+        </div>
+        
+        <!-- 密码登录区域 -->
+        <div id="pwd-box">
+            <div class="form-group">
+                <label>📧 / 🆔 邮箱或用户ID</label>
+                <input id="account" type="text" placeholder="请输入邮箱或用户ID">
+                <div class="hint">💡 提示：可以输入注册时的邮箱，或注册成功后获得的用户ID</div>
+            </div>
+            
+            <div class="form-group">
+                <label>🔒 密码</label>
+                <input id="password" type="password" placeholder="请输入密码">
+            </div>
+        </div>
+        
+        <!-- 验证码登录区域 -->
+        <div id="code-box" style="display: none;">
+            <div class="form-group">
+                <label>📧 / 🆔 邮箱或用户ID</label>
+                <div class="input-group">
+                    <input id="code-account" type="text" placeholder="请输入邮箱或用户ID">
+                    <button id="sendCodeBtn" class="btn-code">发送验证码</button>
+                </div>
+                <div class="hint">💡 提示：可以输入注册时的邮箱，或注册成功后获得的用户ID</div>
+            </div>
+            
+            <div class="form-group">
+                <label>📱 验证码</label>
+                <input id="login-code" type="text" placeholder="请输入验证码" maxlength="6">
+            </div>
+        </div>
+        
+        <button id="loginBtn" class="login-btn">登录</button>
+        
+        <div id="message"></div>
+        
+    </div>
+    
+    <script>
+        // ========== API 配置 ==========
+        // 如果通过后端访问（http://...:5000/login），使用空字符串
+        // 如果直接打开HTML文件，需要设置完整地址
+        const API_BASE = '';
+        // 如果需要指定后端地址，取消注释并修改：
+        // const API_BASE = 'http://172.28.97.188:5000';
+        // ==============================
+        
+        let loginType = "password";
+        let codeCountdown = 0;
+        let codeTimer = null;
+
+        const ADMIN_ROUTE = "{{ admin_route }}";
+        console.log("当前管理员路由：", ADMIN_ROUTE);
+        
+        // DOM 元素
+        const btnPwd = document.getElementById('btn-pwd');
+        const btnCode = document.getElementById('btn-code');
+        const pwdBox = document.getElementById('pwd-box');
+        const codeBox = document.getElementById('code-box');
+        const accountInput = document.getElementById('account');
+        const codeAccountInput = document.getElementById('code-account');
+        const passwordInput = document.getElementById('password');
+        const loginCodeInput = document.getElementById('login-code');
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const messageDiv = document.getElementById('message');
+        
+        // 显示消息
+        function showMessage(text, type) {
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            setTimeout(() => {
+                if (messageDiv.className === `message ${type}`) {
+                    messageDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        messageDiv.className = '';
+                        messageDiv.textContent = '';
+                        messageDiv.style.opacity = '1';
+                    }, 300);
+                }
+            }, 3000);
+        }
+        
+        // 切换登录模式
+        function switchLoginType(type) {
+            loginType = type;
+            if (type === "password") {
+                pwdBox.style.display = "block";
+                codeBox.style.display = "none";
+                btnPwd.classList.add("active");
+                btnCode.classList.remove("active");
+            } else {
+                pwdBox.style.display = "none";
+                codeBox.style.display = "block";
+                btnPwd.classList.remove("active");
+                btnCode.classList.add("active");
+            }
+        }
+        
+        // 更新发送按钮状态
+        function updateSendButton() {
+            if (codeCountdown > 0) {
+                sendCodeBtn.disabled = true;
+                sendCodeBtn.textContent = `${codeCountdown}秒后重试`;
+            } else {
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = '发送验证码';
+            }
+        }
+        
+        // 开始倒计时
+        function startCodeCountdown() {
+            if (codeTimer) clearInterval(codeTimer);
+            codeCountdown = 600;
+            updateSendButton();
+            
+            codeTimer = setInterval(() => {
+                codeCountdown--;
+                updateSendButton();
+                if (codeCountdown <= 0) {
+                    clearInterval(codeTimer);
+                    codeTimer = null;
+                    updateSendButton();
+                }
+            }, 1000);
+        }
+        
+        // 发送登录验证码
+        async function sendLoginCode() {
+            const account = codeAccountInput.value.trim();
+            if (!account) {
+                showMessage("❌ 请输入邮箱/用户ID", 'error');
+                return;
+            }
+            
+            sendCodeBtn.disabled = true;
+            sendCodeBtn.textContent = '发送中...';
+            
+            try {
+                const url = `${API_BASE}/api/${ADMIN_ROUTE}/login-send-code`;
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ account })
+                });
+                const data = await res.json();
+                showMessage(data.msg, data.code === 1 ? 'success' : 'error');
+                
+                if (data.code === 1) {
+                    startCodeCountdown();
+                } else {
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.textContent = '发送验证码';
+                }
+            } catch (error) {
+                console.error('发送失败:', error);
+                showMessage("❌ 发送失败，请稍后重试", 'error');
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = '发送验证码';
+            }
+        }
+        
+        // 登录
+        async function login() {
+            let account;
+            if (loginType === "password") {
+                account = accountInput.value.trim();
+            } else {
+                account = codeAccountInput.value.trim();
+            }
+            
+            if (!account) {
+                showMessage("❌ 请输入邮箱/用户ID", 'error');
+                return;
+            }
+            
+            let payload = {
+                account: account,
+                loginType: loginType
+            };
+            
+            if (loginType === "password") {
+                const password = passwordInput.value;
+                if (!password) {
+                    showMessage("❌ 请输入密码", 'error');
+                    return;
+                }
+                payload.password = password;
+            } else {
+                const code = loginCodeInput.value.trim();
+                if (!code) {
+                    showMessage("❌ 请输入验证码", 'error');
+                    return;
+                }
+                payload.code = code;
+            }
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+            
+            try {
+                const url = `${API_BASE}/api/${ADMIN_ROUTE}/login`;
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                showMessage(data.msg, data.code === 1 ? 'success' : 'error');
+                
+                if (data.code === 1) {
+                    // 存储令牌（access_token/refresh_token）
+                    sessionStorage.setItem('access_token', data.data.access_token);
+                    sessionStorage.setItem('refresh_token', data.data.refresh_token);
+                    sessionStorage.setItem('userId', data.data.userId);
+                    sessionStorage.setItem('loginTime', new Date().toISOString());
+                    
+                    setTimeout(() => {
+                        location.href = `/${ADMIN_ROUTE}/home`;
+                    }, 1000);
+                } else {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                }
+            } catch (e) {
+                console.error('登录异常:', e);
+                showMessage("❌ 登录请求异常，请检查网络连接", 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+            }
+        }
+        
+        // 事件监听
+        btnPwd.addEventListener('click', () => switchLoginType('password'));
+        btnCode.addEventListener('click', () => switchLoginType('code'));
+        sendCodeBtn.addEventListener('click', sendLoginCode);
+        loginBtn.addEventListener('click', login);
+        
+        // 回车键支持
+        accountInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && loginType === 'password') login();
+        });
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+        codeAccountInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendLoginCode();
+        });
+        loginCodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>

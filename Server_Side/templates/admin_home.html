@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员 - 在线背单词系统ZGolvs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2fee2f 0%, #32ac06 100%);
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部导航栏样式 */
+        .navbar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-btn {
+            background: transparent;
+            border: none;
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .navbar-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .navbar-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        /* 主容器样式 */
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+            width: 95%;
+            max-width: 1400px;
+            margin: 30px auto;
+            flex: 1;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 36px;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        /* 个人中心首页按钮样式 */
+        .center-home {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .center-btn {
+            width: 300px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .edit-info-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .account-cancellation-btn {
+            background: linear-gradient(135deg, #f7f4f7 0%, #676465 100%);
+        }
+
+        .center-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* 个人信息编辑区域 */
+        .profile-section {
+            display: none;
+            margin: 40px 0;
+        }
+
+        .profile-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            width: 150px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #666;
+            flex: 1;
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 编辑弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .password-confirm {
+            margin-top: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .cancel-btn {
+            background: #f5f5f5;
+            color: #666;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background: #eee;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 加载提示样式 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            background: #eee;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #ddd;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                gap: 15px;
+            }
+            
+            .navbar-btn {
+                font-size: 16px;
+                padding: 6px 10px;
+            }
+
+            .container {
+                padding: 30px 20px;
+                margin: 20px auto;
+            }
+
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .info-label {
+                width: 100%;
+            }
+
+            .info-value {
+                padding: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="navbar">
+        <button class="navbar-btn active" onclick="navigateTo('userManagement')">用户管理</button>
+        <button class="navbar-btn" onclick="navigateTo('vocabularyManagement')">单词表库管理</button>
+        <button class="navbar-btn" onclick="navigateTo('paperManagement')">试卷管理</button>
+        <button class="navbar-btn" onclick="navigateTo('customerService')">客户服务</button>
+        <button class="navbar-btn" onclick="navigateTo('profile')">个人中心</button>
+    </div>
+
+    <div class="container" id="user-management-container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>用户管理</h2>
+        </div>
+
+        <div class="center-home" id="user-management-center-home">
+            <button class="center-btn edit-info-btn" onclick="editLearnerInfo()">编辑学习用户信息</button>
+            <button class="center-btn account-cancellation-btn" onclick="learnerCancellation()">注销学习用户</button>
+        </div>
+
+        <!-- ====================== 编辑用户弹窗 ====================== -->
+        <div class="profile-section" id="edit-learner-profile-section">
+            <div class="profile-card">
+                <h3 class="modal-title">编辑学习用户信息</h3>
+
+                <div style="margin-bottom:12px;">
+                    <label>用户ID</label>
+                    <input id="edit-learner-id" type="number" placeholder="请输入用户ID" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label>昵称</label>
+                    <input id="edit-learner-nickname" placeholder="新昵称" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label>性别</label>
+                    <input id="edit-learner-gender" placeholder="男/女" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label>学习阶段</label>
+                    <input id="edit-learner-stage" placeholder="初中/高中" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label>考试类型</label>
+                    <input id="edit-learner-exam" placeholder="中考/高考" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label>学校</label>
+                    <input id="edit-learner-school" placeholder="学校名称" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+
+                <div class="modal-buttons">
+                    <button class="cancel-btn" onclick="closeEditLearnerModal()">取消</button>
+                    <button class="confirm-btn" onclick="submitEditLearner()">确认修改</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================== 注销用户弹窗 ====================== -->
+        <div class="profile-section" id="delete-learner-profile-section">
+            <div class="modal-content">
+                <h3 class="modal-title">注销学习用户</h3>
+                <p style="color:red;">警告：此操作不可恢复，将永久删除该用户！</p>
+
+                <div style="margin-bottom:12px;">
+                    <label>请输入要注销的用户ID</label>
+                    <input id="delete-learner-id" type="number" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+
+                <div class="modal-buttons">
+                    <button class="cancel-btn" onclick="closeDeleteLearnerModal()">取消</button>
+                    <button class="confirm-btn" onclick="confirmDeleteLearner()">确认注销</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <div class="container" id="vocabulary-management-container" style="display: none">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>单词表库管理</h2>
+        </div>
+
+        <!-- 单词表列表容器，JS动态填充卡片 -->
+        <div id="word-table-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto 40px;">
+            <!-- 动态渲染的单词表卡片会插入这里 -->
+        </div>
+
+        <!-- 新增单词表加号卡片 -->
+        <div id="add-new-table-card" style="max-width: 320px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 60px 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.06); text-align: center; cursor: pointer;" onclick="openCreateModal()">
+            <span style="font-size: 60px; color: #409eff; font-weight: 300;">+</span>
+            <p style="color: #666; margin:12px 0 0; font-size:16px;">创建新单词表</p>
+        </div>
+
+        <!-- 创建单词表弹窗（隐藏浮层） -->
+        <div id="create-modal" style="display: none; position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+            <div style="background: #fff; border-radius: 16px; padding: 30px; width: min(90%,500px); box-shadow: 0 2px 15px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0 0 20px 0; color: #333;">📚 创建单词表</h2>
+                <p style="color: #666; margin-bottom: 24px;">填写名称后生成空白单词表，后续可批量导入单词</p>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">单词表名称</label>
+                    <input 
+                        id="word-table-name" 
+                        type="text" 
+                        placeholder="请输入单词表名称（如：中考核心词汇）"
+                        style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 15px; box-sizing: border-box;"
+                    >
+                </div>
+
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <button onclick="closeCreateModal()" style="padding: 12px 24px; background: #eee; color:#333; border: none; border-radius: 10px; cursor: pointer; font-size: 15px;">取消</button>
+                    <button onclick="createWordTable()" style="padding: 12px 24px; background: #409eff; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500;">✅ 创建单词表</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON导入弹窗（核心上传模块） -->
+        <div id="json-upload-modal" style="display: none; position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+            <div style="background: #fff; border-radius: 16px; padding: 30px; width: min(90%,520px); box-shadow: 0 2px 15px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0 0 20px 0; color: #333;">📂 JSON批量导入单词</h2>
+                <p id="upload-target-table" style="color: #409eff; font-weight:500; margin-bottom:20px;">目标单词表：</p>
+                <!-- 隐藏原生文件输入 -->
+                <input type="file" id="json-file-input" accept=".json" style="display:none">
+                <!-- 自定义上传按钮区域 -->
+                <div id="upload-area" style="border:2px dashed #73c0de; border-radius:12px; padding:40px 20px; text-align:center; cursor:pointer; margin-bottom:20px;" onclick="document.getElementById('json-file-input').click()">
+                    <p style="font-size:16px; color:#666;">点击选择本地JSON文件</p>
+                    <p id="selected-file-name" style="margin-top:8px; color:#409eff;"></p>
+                </div>
+                <!-- 上传进度提示 -->
+                <div id="upload-tip" style="margin-bottom:20px; color:#666; display:none;"></div>
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <button onclick="closeJsonUploadModal()" style="padding: 12px 24px; background: #eee; color:#333; border: none; border-radius: 10px; cursor: pointer; font-size: 15px;">取消</button>
+                    <button onclick="submitJsonUpload()" id="upload-submit-btn" style="padding: 12px 24px; background: #73c0de; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500;">开始导入</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="word-manage-modal" style="display: none; position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+            <div style="background: #fff; border-radius: 16px; width: min(95%, 1100px); height: 80vh; display: flex; overflow: hidden;">
+                <!-- 左侧：单词拼写列表 -->
+                <div style="width: 320px; border-right: 1px solid #eee; padding:20px; overflow-y:auto;">
+                    <h3 id="manage-table-title" style="margin:0 0 20px; color:#333;"></h3>
+                    <div id="word-spell-list">
+                        <!-- 动态渲染所有单词拼写 -->
+                    </div>
+                </div>
+                <!-- 右侧：单词完整详情面板 -->
+                <div style="flex:1; padding:24px; overflow-y:auto;">
+                    <div id="empty-tip" style="color:#999; font-size:16px; text-align:center; margin-top:100px;">请点击左侧单词查看详情</div>
+                    <div id="word-detail-wrap" style="display:none;">
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">单词拼写</label>
+                            <p id="detail-word" style="font-size:20px; margin:0;"></p>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">音标</label>
+                            <p id="detail-phonetic" style="margin:0;"></p>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">中文释义</label>
+                            <div id="detail-trans" style="margin:0;"></div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">变形信息</label>
+                            <div id="detail-exchange" style="background:#f7f7f7; padding:10px; border-radius:6px;"></div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">例句</label>
+                            <div id="detail-examples" style="margin:0;"></div>
+                        </div>
+                        <div style="margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">英式音频路径</label>
+                            <p id="detail-uk" style="margin:0; word-break:break-all; flex:1;"></p>
+                            <button id="play-uk-btn" style="background:#73c0de; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">播放英式发音</button>
+                        </div>
+                        <div style="margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">美式音频路径</label>
+                            <p id="detail-us" style="margin:0; word-break:break-all; flex:1;"></p>
+                            <button id="play-us-btn" style="background:#91cc75; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">播放美式发音</button>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">创建时间</label>
+                            <p id="detail-ctime" style="margin:0;"></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- 关闭按钮 -->
+                <button onclick="closeWordManageModal()" style="position:absolute; top:16px; right:16px; border:none; background:#eee; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:18px;">×</button>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <!-- 单词表卡片模板，JS克隆渲染 -->
+    <template id="table-card-tpl">
+        <div style="background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 15px rgba(0,0,0,0.06);">
+            <h3 class="table-name-text" style="margin:0 0 16px; font-size:18px; color:#222;"></h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn-word-manage" style="padding:10px; border:none; border-radius:8px; background:#91cc75; color:#fff; cursor:pointer; font-size:14px;">单词管理</button>
+                <button class="btn-json-import" style="padding:10px; border:none; border-radius:8px; background:#73c0de; color:#fff; cursor:pointer; font-size:14px;">JSON导入</button>
+                <button class="btn-export-all" style="padding:10px; border:none; border-radius:8px; background:#ffcb45; color:#222; cursor:pointer; font-size:14px;">全部导出</button>
+                <button class="btn-delete-table" style="padding:10px; border:none; border-radius:8px; background:#e53935; color:#fff; cursor:pointer; font-size:14px;">删除单词表</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- 左侧单词拼写单项模板 -->
+    <template id="spell-item-tpl">
+        <div class="spell-item" style="padding:10px 12px; border-radius:8px; margin-bottom:8px; cursor:pointer; border:1px solid #eee;" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='transparent'">
+            <span class="spell-text"></span>
+        </div>
+    </template>
+
+
+    <div class="container" id="paper-management-container" style="display: none">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>试卷库管理</h2>
+        </div>
+
+        <!-- 试卷列表容器，JS动态填充卡片 -->
+        <div id="paper-table-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto 40px;">
+            <!-- 动态渲染试卷卡片 -->
+        </div>
+
+        <!-- 新增试卷加号卡片 -->
+        <div id="add-new-paper-card" style="max-width: 320px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 60px 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.06); text-align: center; cursor: pointer;" onclick="openCreatePaperModal()">
+            <span style="font-size: 60px; color: #409eff; font-weight: 300;">+</span>
+            <p style="color: #666; margin:12px 0 0; font-size:16px;">创建新试卷</p>
+        </div>
+
+        <!-- 创建试卷弹窗 -->
+        <div id="create-paper-modal" style="display: none; position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+            <div style="background: #fff; border-radius: 16px; padding: 30px; width: min(90%,500px); box-shadow: 0 2px 15px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0 0 20px 0; color: #333;">📄 创建试卷</h2>
+                <p style="color: #666; margin-bottom: 24px;">填写名称生成空白试卷，后续可批量导入题目、管理题目</p>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">试卷名称</label>
+                    <input 
+                        id="paper-name-input" 
+                        type="text" 
+                        placeholder="请输入试卷名称（如：2026上半年CET-4 A卷）"
+                        style="width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 15px; box-sizing: border-box;"
+                    >
+                </div>
+
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <button onclick="closeCreatePaperModal()" style="padding: 12px 24px; background: #eee; color:#333; border: none; border-radius: 10px; cursor: pointer; font-size: 15px;">取消</button>
+                    <button onclick="createPaper()" style="padding: 12px 24px; background: #409eff; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500;">✅ 创建试卷</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON批量导入题目弹窗 -->
+        <div id="paper-json-upload-modal" style="display: none; position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+            <div style="background: #fff; border-radius: 16px; padding: 30px; width: min(90%,520px); box-shadow: 0 2px 15px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0 0 20px 0; color: #333;">📂 JSON批量导入题目</h2>
+                <p id="upload-target-paper" style="color: #409eff; font-weight:500; margin-bottom:20px;">目标试卷：</p>
+                <input type="file" id="paper-json-file-input" accept=".json" style="display:none">
+                <div id="paper-upload-area" style="border:2px dashed #73c0de; border-radius:12px; padding:40px 20px; text-align:center; cursor:pointer; margin-bottom:20px;" onclick="document.getElementById('paper-json-file-input').click()">
+                    <p style="font-size:16px; color:#666;">点击选择本地JSON题目文件</p>
+                    <p id="paper-selected-file-name" style="margin-top:8px; color:#409eff;"></p>
+                </div>
+                <div id="paper-upload-tip" style="margin-bottom:20px; color:#666; display:none;"></div>
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <button onclick="closePaperJsonUploadModal()" style="padding: 12px 24px; background: #eee; color:#333; border: none; border-radius: 10px; cursor: pointer; font-size: 15px;">取消</button>
+                    <button onclick="submitPaperJsonUpload()" id="paper-upload-submit-btn" style="padding: 12px 24px; background: #73c0de; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500;">开始导入题目</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 试卷题目管理弹窗（左右分栏：题目列表+题目详情） -->
+        <div id="paper-question-manage-modal" style="display: none; position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+            <div style="background: #fff; border-radius: 16px; width: min(95%, 1100px); height: 80vh; display: flex; overflow: hidden;">
+                <!-- 左侧题目ID列表 -->
+                <div style="width: 320px; border-right: 1px solid #eee; padding:20px; overflow-y:auto;">
+                    <h3 id="manage-paper-title" style="margin:0 0 20px; color:#333;"></h3>
+                    <div id="paper-question-id-list"></div>
+                </div>
+                <!-- 右侧题目详情面板 -->
+                <div style="flex:1; padding:24px; overflow-y:auto;">
+                    <div id="paper-empty-tip" style="color:#999; font-size:16px; text-align:center; margin-top:100px;">请点击左侧题目查看详情</div>
+                    <div id="paper-question-detail-wrap" style="display:none;">
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">题目ID</label>
+                            <p id="detail-q-id" style="font-size:20px; margin:0;"></p>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">题干内容</label>
+                            <div id="detail-q-content" style="white-space:pre-wrap; line-height:1.6;"></div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">标准答案</label>
+                            <div id="detail-q-answer" style="white-space:pre-wrap; line-height:1.6;"></div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:bold; color:#555; display:block; margin-bottom:6px;">是否客观题</label>
+                            <p id="detail-q-objective" style="margin:0;"></p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closePaperQuestionManageModal()" style="position:absolute; top:16px; right:16px; border:none; background:#eee; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:18px;">×</button>
+            </div>
+        </div>
+
+        <!-- 删除试卷确认弹窗 -->
+        <div id="delete-paper-confirm-modal" style="display: none; position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+            <div style="background: #fff; border-radius: 16px; padding: 30px; width: min(90%,480px); box-shadow: 0 2px 15px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0 0 20px 0; color: #e53935;">🗑️ 删除试卷</h2>
+                <p style="color: #666; margin-bottom: 12px;">删除后该试卷内所有题目永久清除，数据无法恢复！</p>
+                <p style="margin-bottom:24px;">待删除试卷：<b id="delete-target-paper-name" style="color:#e53935;"></b></p>
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <button onclick="closeDeletePaperModal()" style="padding: 12px 24px; background: #eee; color:#333; border: none; border-radius: 10px; cursor: pointer; font-size: 15px;">取消</button>
+                    <button onclick="confirmDeletePaper()" style="padding: 12px 24px; background: #e53935; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500;">确认永久删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 试卷卡片渲染模板，和单词表卡片样式统一 -->
+    <template id="paper-card-tpl">
+        <div style="background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 15px rgba(0,0,0,0.06);">
+            <h3 class="paper-name-text" style="margin:0 0 16px; font-size:18px; color:#222;"></h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn-paper-manage" style="padding:10px; border:none; border-radius:8px; background:#91cc75; color:#fff; cursor:pointer; font-size:14px;">题目管理</button>
+                <button class="btn-paper-json-import" style="padding:10px; border:none; border-radius:8px; background:#73c0de; color:#fff; cursor:pointer; font-size:14px;">JSON导入题目</button>
+                <button class="btn-paper-export-all" style="padding:10px; border:none; border-radius:8px; background:#ffcb45; color:#222; cursor:pointer; font-size:14px;">全部导出题目</button>
+                <button class="btn-paper-delete" style="padding:10px; border:none; border-radius:8px; background:#e53935; color:#fff; cursor:pointer; font-size:14px;">删除试卷</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- 客户服务面板（默认隐藏） -->
+    <div id="admin-service-panel" style="display: none; padding: 20px;">
+        <!-- 未回复反馈列表 -->
+        <div id="unreplied-list-panel">
+            <h2 style="color: #e20606; margin-bottom: 20px;">未回复反馈</h2>
+            <div id="feedback-card-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                <!-- 卡片由JS动态生成 -->
+            </div>
+        </div>
+
+        <!-- 反馈详情 & 回复面板（默认隐藏） -->
+        <div id="feedback-detail-panel" style="display: none;">
+            <button onclick="backToList()" style="padding: 8px 16px; background: #909399; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px;">返回列表</button>
+            <div style="background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                <h3 id="detail-nickname" style="color: #333; margin: 0 0 10px 0;"></h3>
+                <div id="detail-sendtime" style="font-size: 13px; color: #999; margin-bottom: 15px;"></div>
+                <div id="detail-content" style="background: #f8f9fa; padding: 15px; border-radius: 8px; color: #333; line-height: 1.6; margin-bottom: 20px;"></div>
+                <textarea id="reply-content" placeholder="请输入回复内容..." style="width: 100%; height: 120px; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; resize: none;"></textarea>
+                <button onclick="submitReply()" style="margin-top: 12px; padding: 10px 24px; background: #409eff; color: white; border: none; border-radius: 8px; cursor: pointer;">提交回复</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容容器 -->
+    <div class="container" id="profile-container" style="display: none">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>👤 个人中心
+            <!-- 右侧：用户ID & 邮箱 字体更小 -->
+            <div style="font-size: 14px; color: #555;">
+                用户ID：<span id="header-userId">-</span>
+                &nbsp;&nbsp;&nbsp;
+                邮箱：<span id="header-userEmail">-</span>
+            </div>
+            </h2>
+        </div>
+
+        <!-- 个人中心首页（三个按钮） -->
+        <div class="center-home" id="center-home">
+            <button class="center-btn edit-info-btn" onclick="goToEditInfo()">编辑个人信息</button>
+            <button class="center-btn logout-btn" onclick="logout()">退出登录</button>
+            <button class="center-btn account-cancellation-btn" onclick="accountCancellation()">注销账号</button>
+        </div>
+
+        <!-- 个人信息编辑区域（点击"编辑个人信息"后显示） -->
+        <div class="profile-section" id="profile-section">
+            <button class="back-btn" onclick="backToHome()">← 返回</button>
+            <div class="profile-card">
+                <div class="info-item">
+                    <div class="info-label">用户昵称</div>
+                    <div class="info-value" id="nickname-value">加载中...</div>
+                    <button class="edit-btn" onclick="openEditModal('nickname')">修改</button>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">密码</div>
+                    <div class="info-value" id="password-value">●●●●●●●●</div>
+                    <button class="edit-btn" onclick="openEditModal('password')">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑弹窗 -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modal-title">修改信息</h3>
+            <div class="modal-form" id="modal-form">
+                <!-- 动态生成表单内容 -->
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeEditModal()">取消</button>
+                <button class="confirm-btn" onclick="confirmEdit()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== API 配置 ==========
+        const API_BASE = 'http://localhost:5000';
+        // 当前编辑的字段
+        let currentEditField = '';
+        // 用户信息缓存
+        let userInfo = {};
+
+        const ADMIN_ROUTE = "{{ admin_route }}";
+        console.log("当前管理员路由：", ADMIN_ROUTE);
+
+        
+        let activeSpellItem = null;
+        let globalAudio = null;
+
+        // ==============================
+
+        // 页面加载时校验令牌
+        window.onload = function() {
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                location.href = `/${ADMIN_ROUTE}/login`;
+                return;
+            }
+            console.log(accessToken);
+        };
+
+        window.onload = function () {
+            try {
+                const token = sessionStorage.getItem('access_token');
+                if (!token) {
+                    location.href = `/${ADMIN_ROUTE}/login`;
+                    return;
+                }
+
+                // 解码 JWT（前端直接解析，不请求后端）
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const userId = payload.sub;
+                const email = payload.email;
+
+                // 赋值到右上角
+                document.getElementById('header-userId').innerText = userId;
+                document.getElementById('header-userEmail').innerText = email;
+            } catch (e) {
+                console.log("获取用户信息失败");
+            }
+        };
+
+        // 导航跳转函数
+        function navigateTo(page) {
+            document.querySelectorAll('.navbar-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 关键：切换时隐藏所有内容
+            document.getElementById('user-management-container').style.display = 'none';
+            document.getElementById('vocabulary-management-container').style.display = 'none';
+            document.getElementById('paper-management-container').style.display = 'none';
+            document.getElementById('admin-service-panel').style.display = 'none';
+            document.getElementById('profile-container').style.display = 'none';
+
+            switch(page) {
+                case 'userManagement':
+                    document.getElementById('user-management-container').style.display = 'block';
+                    userManagement();
+                    break;
+                case 'vocabularyManagement':
+                    document.getElementById('vocabulary-management-container').style.display = 'block';
+                    vocabularyManagement();
+                    break;
+                case 'paperManagement':
+                    document.getElementById('paper-management-container').style.display = 'block';
+                    paperManagement();
+                    break;
+                case 'customerService':
+                    document.getElementById('admin-service-panel').style.display = 'block';
+                    showAdminServicePanel();
+                    break;
+                case 'profile':
+                    document.getElementById('profile-container').style.display = 'block';
+                    backToHome();
+                    break;
+            }
+        }
+
+        function userManagement() {
+            document.getElementById("user-management-center-home").style.display = 'flex';
+        }
+
+        // ====================== 用户管理 ======================
+        function editLearnerInfo() {
+            document.getElementById('user-management-center-home').style.display = 'none';
+            document.getElementById("edit-learner-profile-section").style.display = "block";
+        }
+        function closeEditLearnerModal() {
+            document.getElementById("edit-learner-profile-section").style.display = "none";
+            userManagement();
+        }
+
+        function learnerCancellation() {
+            document.getElementById('user-management-center-home').style.display = 'none';
+            document.getElementById("delete-learner-profile-section").style.display = "block";
+        }
+        function closeDeleteLearnerModal() {
+            document.getElementById("delete-learner-profile-section").style.display = "none";
+            userManagement();
+        }
+
+        // 提交修改用户信息
+        async function submitEditLearner() {
+            const user_id = document.getElementById("edit-learner-id").value;
+            if (!user_id) {
+                alert("请输入用户ID");
+                return;
+            }
+
+            const data = {
+                user_id: parseInt(user_id),
+                nickname: document.getElementById("edit-learner-nickname").value.trim() || null,
+                gender: document.getElementById("edit-learner-gender").value.trim() || null,
+                stage: document.getElementById("edit-learner-stage").value.trim() || null,
+                exam: document.getElementById("edit-learner-exam").value.trim() || null,
+                school: document.getElementById("edit-learner-school").value.trim() || null
+            };
+
+            const res = await fetch(`/api/${ADMIN_ROUTE}/learner/update`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.msg);
+            if (result.code === 1) closeEditLearnerModal();
+        }
+
+        // 确认注销用户
+        async function confirmDeleteLearner() {
+            const user_id = document.getElementById("delete-learner-id").value;
+            if (!user_id) {
+                alert("请输入用户ID");
+                return;
+            }
+            if (!confirm("确定要注销该用户吗？此操作不可恢复！")) return;
+
+            const res = await fetch(`/api/${ADMIN_ROUTE}/learner/delete?user_id=${user_id}`, {
+                method: "POST"
+            });
+            const result = await res.json();
+            alert(result.msg);
+            if (result.code === 1) closeDeleteLearnerModal();
+        }
+
+        async function loadWordTableList(){
+            const listWrap = document.getElementById('word-table-list');
+            const tpl = document.getElementById('table-card-tpl');
+            listWrap.innerHTML = ""; // 清空旧列表
+
+            try{
+                // 请求后端获取所有vocabularyName列表
+                const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/list`);
+                const data = await res.json();
+                if(data.code === 1 && Array.isArray(data.list)){
+                    data.list.forEach(tableName => {
+                        // 克隆卡片模板
+                        const cardDom = tpl.content.cloneNode(true).querySelector('div');
+                        cardDom.querySelector('.table-name-text').innerText = tableName;
+                        // 绑定每个按钮点击事件，携带当前表名
+                        cardDom.querySelector('.btn-word-manage').onclick = ()=> openWordManage(tableName);
+                        cardDom.querySelector('.btn-json-import').onclick = ()=> openJsonImport(tableName);
+                        cardDom.querySelector('.btn-export-all').onclick = ()=> exportWordTable(tableName);
+                        cardDom.querySelector('.btn-delete-table').onclick = ()=> triggerDeleteTable(tableName);
+                        listWrap.appendChild(cardDom);
+                    })
+                }
+            }catch(err){
+                console.error('加载单词表列表失败',err);
+            }
+        }
+
+        // 打开创建弹窗
+        function openCreateModal(){
+            document.getElementById('create-modal').style.display = 'flex';
+            document.getElementById('word-table-name').value = '';
+        }
+        // 关闭创建弹窗
+        function closeCreateModal(){
+            document.getElementById('create-modal').style.display = 'none';
+        }
+
+        // 创建单词表接口请求
+        async function createWordTable(){
+            const tableName = document.getElementById('word-table-name').value.trim();
+            if(!tableName){
+                alert('请填写单词表名称');
+                return;
+            }
+            const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/create`,{
+                method:'POST',
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({table_name:tableName})
+            })
+            const ret = await res.json();
+            alert(ret.msg);
+            if(ret.code === 1){
+                closeCreateModal();
+                loadWordTableList(); // 刷新列表
+            }
+        }
+
+        // 删除单词表前置确认
+        function triggerDeleteTable(tableName){
+            const confirmDel = confirm(`⚠️ 确定要永久删除【${tableName}】吗？所有单词数据无法恢复！`);
+            if(!confirmDel) return;
+            deleteWordTable(tableName);
+        }
+
+        // 删除单词表请求
+        async function deleteWordTable(tableName){
+            const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/delete`,{
+                method:'POST',
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({table_name:tableName})
+            })
+            const ret = await res.json();
+            alert(ret.msg);
+            if(ret.code === 1){
+                loadWordTableList(); // 删除成功刷新列表
+            }
+        }
+
+        // 1.单词管理页面跳转
+        async function openWordManage(tableName){
+            currentManageTableName = tableName;
+            document.getElementById('manage-table-title').innerText = `单词表：${tableName}`;
+            document.getElementById('word-spell-list').innerHTML = "";
+            document.getElementById('empty-tip').style.display = "block";
+            document.getElementById('word-detail-wrap').style.display = "none";
+            document.getElementById('word-manage-modal').style.display = 'flex';
+
+            // 请求接口获取全部单词拼写列表
+            try{
+                const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/spell-list`,{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({table_name: tableName})
+                })
+                const ret = await res.json();
+                if(ret.code !== 1 || !Array.isArray(ret.spell_list)){
+                    alert(ret.msg || "获取单词列表失败");
+                    return;
+                }
+                const spellWrap = document.getElementById('word-spell-list');
+                const spellTpl = document.getElementById('spell-item-tpl');
+                ret.spell_list.forEach(wordSpell => {
+                    const item = spellTpl.content.cloneNode(true).querySelector('.spell-item');
+                    item.querySelector('.spell-text').innerText = wordSpell;
+                    // 点击单词，查询完整详情
+                    item.onclick = ()=> {
+                        // 清空上一个选中背景
+                        if(activeSpellItem) activeSpellItem.style.background = "";
+                        // 设置当前高亮
+                        item.style.background = "#e6f0ff";
+                        activeSpellItem = item;
+                        // 加载详情
+                        loadWordDetail(wordSpell);
+                    };
+                    spellWrap.appendChild(item);
+                })
+            }catch(e){
+                console.error("加载拼写列表异常",e);
+                alert("网络请求失败");
+            }
+        }
+
+        // 关闭单词管理弹窗
+        function closeWordManageModal(){
+            document.getElementById('word-manage-modal').style.display = 'none';
+            currentManageTableName = "";
+        }
+
+        async function playWordAudio(tableName, word, audioType) {
+            // 先停止正在播放的音频
+            if (globalAudio) {
+                globalAudio.pause();
+                globalAudio = null;
+            }
+
+            try {
+                const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/play-audio`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        table_name: tableName,
+                        word: word,
+                        audio_type: audioType
+                    })
+                });
+
+                // 如果返回JSON错误信息
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const errJson = await res.json();
+                    alert(errJson.msg || "音频加载失败");
+                    return;
+                }
+
+                // 拿到二进制音频流，创建播放地址
+                const blob = await res.blob();
+                const audioUrl = URL.createObjectURL(blob);
+                globalAudio = new Audio(audioUrl);
+                
+                // 播放结束释放内存
+                globalAudio.onended = () => {
+                    URL.revokeObjectURL(audioUrl);
+                    globalAudio = null;
+                };
+
+                await globalAudio.play();
+            } catch (err) {
+                console.error("音频播放异常", err);
+                alert("音频请求或播放失败");
+            }
+        }
+
+        // 根据单词拼写加载完整详情
+        async function loadWordDetail(wordSpell){
+            try{
+                const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/word-detail`,{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({
+                        table_name: currentManageTableName,
+                        word: wordSpell
+                    })
+                })
+                const ret = await res.json();
+                if(ret.code !== 1){
+                    alert(ret.msg || "查询单词详情失败");
+                    return;
+                }
+                const data = ret.data;
+
+                // ---------- 原有释义/变形/例句拆分渲染代码完全保留 ----------
+                let transHtml = "";
+                if(data.translations){
+                    const transArr = data.translations.split("；");
+                    transArr.forEach(item=>{
+                        transHtml += `<div style="margin:4px 0;">• ${item}</div>`;
+                    })
+                }
+
+                let exchangeHtml = "";
+                try{
+                    const exchangeObj = JSON.parse(data.exchanges);
+                    for(let key in exchangeObj){
+                        exchangeHtml += `<div style="margin:3px 0;">${key}：${exchangeObj[key]}</div>`;
+                    }
+                }catch{
+                    exchangeHtml = data.exchanges;
+                }
+
+                let exampleHtml = "";
+                if(data.examples){
+                    const exampleArr = data.examples.split("|||");
+                    exampleArr.forEach(item=>{
+                        if(item.trim()){
+                            exampleHtml += `<div style="margin:6px 0; line-height:1.5;">▸ ${item}</div>`;
+                        }
+                    })
+                }
+
+                document.getElementById('empty-tip').style.display = "none";
+                document.getElementById('word-detail-wrap').style.display = "block";
+                document.getElementById('detail-word').innerText = data.word;
+                document.getElementById('detail-phonetic').innerText = data.phonetic;
+                document.getElementById('detail-trans').innerHTML = transHtml;
+                document.getElementById('detail-exchange').innerHTML = exchangeHtml;
+                document.getElementById('detail-examples').innerHTML = exampleHtml;
+                document.getElementById('detail-uk').innerText = data.uk_audio_path || "无";
+                document.getElementById('detail-us').innerText = data.us_audio_path || "无";
+                document.getElementById('detail-ctime').innerText = data.createTime;
+
+                const ukBtn = document.getElementById("play-uk-btn");
+                const usBtn = document.getElementById("play-us-btn");
+
+                // 英式按钮
+                ukBtn.onclick = () => {
+                    playWordAudio(currentManageTableName, wordSpell, "uk");
+                };
+                // 美式按钮
+                usBtn.onclick = () => {
+                    playWordAudio(currentManageTableName, wordSpell, "us");
+                };
+
+            }catch(e){
+                console.error("加载单词详情异常",e);
+                alert("详情请求失败");
+            }
+        }
+
+        // 2.JSON批量导入
+        function openJsonImport(tableName){
+            console.log('打开JSON导入：',tableName);
+            // 可弹出文件选择框，上传json文件提交后端导入接口
+            currentUploadTableName = tableName;
+            selectedFile = null;
+            document.getElementById('upload-target-table').innerText = `目标单词表：${tableName}`;
+            document.getElementById('selected-file-name').innerText = "";
+            document.getElementById('upload-tip').style.display = "none";
+            document.getElementById('json-upload-modal').style.display = 'flex';
+        }
+
+        function closeJsonUploadModal(){
+            document.getElementById('json-upload-modal').style.display = 'none';
+            currentUploadTableName = "";
+            selectedFile = null;
+        }
+
+        // 监听文件选择变化
+        document.getElementById('json-file-input').addEventListener('change', function(e){
+            const file = e.target.files[0];
+            if(!file) return;
+            // 校验文件后缀
+            if(!file.name.endsWith('.json')){
+                alert("请选择后缀为 .json 的文件");
+                this.value = "";
+                return;
+            }
+            selectedFile = file;
+            document.getElementById('selected-file-name').innerText = `已选中：${file.name}`;
+        })
+
+        // 提交文件上传到后端
+        async function submitJsonUpload(){
+            if(!selectedFile){
+                alert("请先选择本地JSON文件");
+                return;
+            }
+            if(!currentUploadTableName){
+                alert("未匹配目标单词表");
+                return;
+            }
+            const tipDom = document.getElementById('upload-tip');
+            const submitBtn = document.getElementById('upload-submit-btn');
+            tipDom.style.display = "block";
+            tipDom.innerText = "正在上传并解析数据，请稍候...";
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = "0.6";
+
+            // 使用FormData传输文件 + 表单参数
+            const formData = new FormData();
+            formData.append("table_name", currentUploadTableName);
+            formData.append("json_file", selectedFile);
+
+            try{
+                // 后端接口地址：POST 接收form-data
+                const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/json-import`,{
+                    method: "POST",
+                    body: formData // FormData自动携带multipart/form-data头，不要手动加Content-Type
+                })
+                const result = await res.json();
+                if(result.code === 1){
+                    tipDom.style.color = "#009432";
+                    tipDom.innerText = `导入成功！${result.msg || "单词已批量写入"}`;
+                    // 上传成功2秒后关闭弹窗，刷新列表
+                    setTimeout(()=>{
+                        closeJsonUploadModal();
+                        loadWordTableList();
+                    },2000)
+                }else{
+                    tipDom.style.color = "#e53935";
+                    tipDom.innerText = `导入失败：${result.msg}`;
+                }
+            }catch(err){
+                tipDom.style.color = "#e53935";
+                tipDom.innerText = "网络请求异常，上传中断";
+                console.error("上传错误",err);
+            }finally{
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = "1";
+            }
+        }
+
+        async function exportWordTable(tableName) {
+            try {
+                const res = await fetch(`/api/${ADMIN_ROUTE}/word-table/export-all`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        table_name: tableName
+                    })
+                });
+
+                // 处理JSON错误返回
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const errJson = await res.json();
+                    alert(errJson.msg || "导出失败");
+                    return;
+                }
+
+                // 接收二进制Excel流，触发浏览器下载
+                const blob = await res.blob();
+                const downloadUrl = URL.createObjectURL(blob);
+                const aTag = document.createElement("a");
+                aTag.href = downloadUrl;
+                // 从响应头提取文件名
+                const contentDisposition = res.headers.get("Content-Disposition");
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+                    if (filenameMatch) {
+                        aTag.download = filenameMatch[1];
+                    }
+                } else {
+                    aTag.download = `${tableName}_单词表数据.xlsx`;
+                }
+                document.body.appendChild(aTag);
+                aTag.click();
+                document.body.removeChild(aTag);
+                URL.revokeObjectURL(downloadUrl);
+
+                alert("导出成功！文件已开始下载");
+            } catch (err) {
+                console.error("导出异常", err);
+                alert("导出请求失败，请检查网络");
+            }
+        }
+
+        function vocabularyManagement() {
+            //document.getElementById("word-table-panel").style.display = "block";
+            loadWordTableList();
+        }
+
+        async function loadAllPaperList(){
+            const token = sessionStorage.getItem("access_token");
+            const listWrap = document.getElementById("paper-table-list");
+            listWrap.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:#999;">加载试卷列表中...</div>`;
+            try{
+                const res = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/paper/get-all-paper`,{
+                    headers:{Authorization:`Bearer ${token}`}
+                })
+                const data = await res.json();
+                if(data.code !== 1){
+                    listWrap.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:#e53935;">${data.msg}</div>`;
+                    return;
+                }
+                paperListData = data.data;
+                listWrap.innerHTML = "";
+                const tpl = document.getElementById("paper-card-tpl");
+                paperListData.forEach(paper=>{
+                    const cardDom = tpl.content.cloneNode(true).querySelector("div");
+                    cardDom.querySelector(".paper-name-text").innerText = paper.paperName;
+                    // 绑定卡片按钮事件
+                    cardDom.querySelector(".btn-paper-manage").onclick = ()=> openPaperQuestionManage(paper.paperName);
+                    cardDom.querySelector(".btn-paper-json-import").onclick = ()=> openPaperJsonUploadModal(paper.paperName);
+                    cardDom.querySelector(".btn-paper-export-all").onclick = ()=> exportAllPaperQuestion(paper.paperName);
+                    cardDom.querySelector(".btn-paper-delete").onclick = ()=> openDeletePaperModal(paper.paperName);
+                    listWrap.appendChild(cardDom);
+                })
+            }catch(err){
+                console.error("加载试卷列表失败：",err);
+                listWrap.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:#e53935;">网络请求失败</div>`;
+            }
+        }
+
+        // ====================== 创建试卷弹窗控制 ======================
+        function openCreatePaperModal(){
+            document.getElementById("create-paper-modal").style.display = "flex";
+            document.getElementById("paper-name-input").value = "";
+        }
+        function closeCreatePaperModal(){
+            document.getElementById("create-paper-modal").style.display = "none";
+        }
+        /** 创建空白试卷 */
+        async function createPaper(){
+            const token = sessionStorage.getItem("access_token");
+            const paperName = document.getElementById("paper-name-input").value.trim();
+            if(!paperName){
+                alert("请输入试卷名称");
+                return;
+            }
+            try{
+                const res = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/paper/create-paper`,{
+                    method:"POST",
+                    headers:{
+                        Authorization:`Bearer ${token}`,
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({paperName:paperName})
+                })
+                const data = await res.json();
+                if(data.code === 1){
+                    alert("试卷创建成功");
+                    closeCreatePaperModal();
+                    await loadAllPaperList();
+                }else{
+                    alert(data.msg);
+                }
+            }catch(err){
+                console.error(err);
+                alert("创建试卷请求异常");
+            }
+        }
+
+        // ====================== JSON导入题目弹窗控制 ======================
+        function openPaperJsonUploadModal(paperName){
+            currentOperatePaperName = paperName;
+            document.getElementById("upload-target-paper").innerText = `目标试卷：${paperName}`;
+            document.getElementById("paper-selected-file-name").innerText = "";
+            document.getElementById("paper-upload-tip").style.display = "none";
+            document.getElementById("paper-json-file-input").value = "";
+            document.getElementById("paper-json-upload-modal").style.display = "flex";
+        }
+        function closePaperJsonUploadModal(){
+            document.getElementById("paper-json-upload-modal").style.display = "none";
+        }
+        /** 提交JSON题目导入 */
+        async function submitPaperJsonUpload(){
+            const token = sessionStorage.getItem("access_token");
+            const fileDom = document.getElementById("paper-json-file-input");
+            const file = fileDom.files[0];
+            if(!file){
+                alert("请选择JSON文件");
+                return;
+            }
+            const tipDom = document.getElementById("paper-upload-tip");
+            tipDom.style.display = "block";
+            tipDom.innerText = "正在解析并导入题目，请稍候...";
+            const formData = new FormData();
+            formData.append("jsonFile", file);
+            formData.append("paperName", currentOperatePaperName);
+            try{
+                const res = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/paper/upload-question-json`,{
+                    method:"POST",
+                    headers:{Authorization:`Bearer ${token}`},
+                    body:formData
+                })
+                const data = await res.json();
+                if(data.code === 1){
+                    tipDom.style.color = "#059669";
+                    tipDom.innerText = `导入完成，共新增${data.count}道题目`;
+                    setTimeout(()=>{
+                        closePaperJsonUploadModal();
+                        loadAllPaperList();
+                    },1500)
+                }else{
+                    tipDom.style.color = "#e53935";
+                    tipDom.innerText = data.msg;
+                }
+            }catch(err){
+                console.error(err);
+                tipDom.style.color = "#e53935";
+                tipDom.innerText = "导入失败，网络异常";
+            }
+        }
+
+        // ====================== 题目管理弹窗（查看全部题目详情） ======================
+        async function openPaperQuestionManage(paperName){
+            currentOperatePaperName = paperName;
+            const modal = document.getElementById("paper-question-manage-modal");
+            modal.style.display = "flex";
+            document.getElementById("manage-paper-title").innerText = paperName;
+            document.getElementById("paper-empty-tip").style.display = "block";
+            document.getElementById("paper-question-detail-wrap").style.display = "none";
+            const listWrap = document.getElementById("paper-question-id-list");
+            listWrap.innerHTML = "加载题目中...";
+            const token = sessionStorage.getItem("access_token");
+            try{
+                const res = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/paper/get-all-questions?paperName=${encodeURIComponent(paperName)}`,{
+                    headers:{Authorization:`Bearer ${token}`}
+                })
+                const data = await res.json();
+                listWrap.innerHTML = "";
+                if(data.code !== 1 || data.data.length === 0){
+                    listWrap.innerHTML = "<div style='color:#999;text-align:center;padding:20px;'>该试卷暂无题目</div>";
+                    return;
+                }
+                // 渲染题目ID列表按钮
+                data.data.forEach(q=>{
+                    const btn = document.createElement("button");
+                    btn.style = "width:100%;padding:10px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;cursor:pointer;text-align:left;";
+                    btn.innerText = `题目ID：${q.questionId}`;
+                    btn.onclick = ()=> renderSingleQuestionDetail(q);
+                    listWrap.appendChild(btn);
+                })
+            }catch(err){
+                console.error(err);
+                listWrap.innerHTML = "<div style='color:#e53935;text-align:center;padding:20px;'>加载题目失败</div>";
+            }
+        }
+        function closePaperQuestionManageModal(){
+            document.getElementById("paper-question-manage-modal").style.display = "none";
+        }
+        /** 渲染单道题目详情 */
+        function renderSingleQuestionDetail(qData){
+            document.getElementById("paper-empty-tip").style.display = "none";
+            const detailWrap = document.getElementById("paper-question-detail-wrap");
+            detailWrap.style.display = "block";
+            document.getElementById("detail-q-id").innerText = qData.questionId;
+            document.getElementById("detail-q-content").innerText = qData.question;
+            document.getElementById("detail-q-answer").innerText = qData.answer || "无";
+            document.getElementById("detail-q-objective").innerText = qData.objective ? "客观题（单选/多选）" : "主观题（简答/写作）";
+        }
+
+        // ====================== 导出全部题目 ======================
+        async function exportAllPaperQuestion(paperName){
+            const token = sessionStorage.getItem("access_token");
+            try{
+                const res = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/paper/export-all-question?paperName=${encodeURIComponent(paperName)}`,{
+                    headers:{Authorization:`Bearer ${token}`}
+                })
+                if(!res.ok) throw new Error("导出失败");
+                const blob = await res.blob();
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `${paperName}_试卷全量题目.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(a.href);
+            }catch(err){
+                console.error(err);
+                alert("导出题目失败，请稍后重试");
+            }
+        }
+
+        // ====================== 删除试卷弹窗逻辑 ======================
+        function openDeletePaperModal(paperName){
+            currentOperatePaperName = paperName;
+            document.getElementById("delete-target-paper-name").innerText = paperName;
+            document.getElementById("delete-paper-confirm-modal").style.display = "flex";
+        }
+        function closeDeletePaperModal(){
+            document.getElementById("delete-paper-confirm-modal").style.display = "none";
+        }
+        /** 确认删除试卷 */
+        async function confirmDeletePaper(){
+            const token = sessionStorage.getItem("access_token");
+            const paperName = currentOperatePaperName;
+            try{
+                const res = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/paper/delete-paper`,{
+                    method:"POST",
+                    headers:{
+                        Authorization:`Bearer ${token}`,
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({paperName:paperName})
+                })
+                const data = await res.json();
+                if(data.code === 1){
+                    alert("试卷已永久删除");
+                    closeDeletePaperModal();
+                    await loadAllPaperList();
+                }else{
+                    alert(data.msg);
+                }
+            }catch(err){
+                console.error(err);
+                alert("删除请求异常");
+            }
+        }
+
+        function paperManagement() {
+            //document.getElementById("create-paper-panel").style.display = "block";
+            loadAllPaperList();
+        }
+
+        // ====================== 管理员客户服务 ======================
+        let currentFeedbackId = null;
+
+        // 显示客服面板
+        function showAdminServicePanel() {
+            document.getElementById("admin-service-panel").style.display = "block";
+            document.getElementById("unreplied-list-panel").style.display = "block";
+            document.getElementById("feedback-detail-panel").style.display = "none";
+            loadUnrepliedFeedbacks();
+        }
+
+        // 加载未回复反馈列表
+        async function loadUnrepliedFeedbacks() {
+            const token = sessionStorage.getItem("access_token");
+            const res = await fetch(`/api/${ADMIN_ROUTE}/feedback/unreplied`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            const data = await res.json();
+            const container = document.getElementById("feedback-card-container");
+            container.innerHTML = "";
+
+            if (data.code !== 1 || !data.data.length) {
+                container.innerHTML = `<div style="color: #666; grid-column: 1 / -1; text-align: center; padding: 40px;">暂无未回复反馈</div>`;
+                return;
+            }
+
+            data.data.forEach(item => {
+                const card = document.createElement("div");
+                card.style.background = "#fff";
+                card.style.borderRadius = "12px";
+                card.style.padding = "16px";
+                card.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+                card.style.cursor = "pointer";
+                card.onclick = () => viewFeedbackDetail(item.feedbackId);
+
+                card.innerHTML = `
+                    <div style="font-weight: bold; color: #333; margin-bottom: 8px;">${item.nickname}</div>
+                    <div style="font-size: 14px; color: #666; line-height: 1.5;">${item.shortContent}</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 12px;">${item.sendTime}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 查看反馈详情
+        async function viewFeedbackDetail(feedbackId) {
+            currentFeedbackId = feedbackId;
+            const token = sessionStorage.getItem("access_token");
+            const res = await fetch(`/api/${ADMIN_ROUTE}/feedback/detail/${feedbackId}`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            const data = await res.json();
+
+            if (data.code !== 1) {
+                alert(data.msg);
+                return;
+            }
+
+            const item = data.data;
+            document.getElementById("detail-nickname").textContent = item.nickname;
+            document.getElementById("detail-sendtime").textContent = item.sendTime;
+            document.getElementById("detail-content").textContent = item.content;
+
+            document.getElementById("unreplied-list-panel").style.display = "none";
+            document.getElementById("feedback-detail-panel").style.display = "block";
+        }
+
+        // 返回列表
+        function backToList() {
+            document.getElementById("feedback-detail-panel").style.display = "none";
+            document.getElementById("unreplied-list-panel").style.display = "block";
+            currentFeedbackId = null;
+        }
+
+        // 提交回复
+        async function submitReply() {
+            const content = document.getElementById("reply-content").value.trim();
+            if (!content) {
+                alert("请输入回复内容");
+                return;
+            }
+            if (!currentFeedbackId) {
+                alert("请先选择一条反馈");
+                return;
+            }
+
+            const token = sessionStorage.getItem("access_token");
+            const res = await fetch(`/api/${ADMIN_ROUTE}/feedback/reply`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    feedbackId: currentFeedbackId,
+                    content: content
+                })
+            });
+
+            const data = await res.json();
+            alert(data.msg);
+            if (data.code === 1) {
+                document.getElementById("reply-content").value = "";
+                backToList();
+                loadUnrepliedFeedbacks(); // 刷新列表
+            }
+        }
+
+        // 点击"编辑个人信息"，进入编辑页面并加载用户信息
+        async function goToEditInfo() {
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                location.href = `/${ADMIN_ROUTE}/login`;
+                return;
+            }
+            console.log(accessToken);
+
+            // 隐藏首页，显示编辑页面
+            document.getElementById('center-home').style.display = 'none';
+            document.getElementById('profile-section').style.display = 'block';
+
+            // 加载用户信息
+            await loadUserProfile();
+        }
+
+        // 返回个人中心首页
+        function backToHome() {
+            document.getElementById('center-home').style.display = 'flex';
+            document.getElementById('profile-section').style.display = 'none';
+        }
+
+        // 加载用户个人信息
+        async function loadUserProfile() {
+            try {
+                const accessToken = sessionStorage.getItem('access_token');
+                console.log(accessToken);
+                const response = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/profile`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) throw new Error("获取用户信息失败");
+                
+                const data = await response.json();
+                if (data.code === 1) {
+                    userInfo = data.data;
+
+                    // 更新页面显示
+                    document.getElementById('nickname-value').textContent = userInfo.nickname || '未设置';
+                } else {
+                    alert(data.message || '获取用户信息失败');
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+                alert('加载用户信息失败，请重试');
+            }
+        }
+
+        // 打开编辑弹窗
+        function openEditModal(field) {
+            currentEditField = field;
+            const modal = document.getElementById('edit-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalForm = document.getElementById('modal-form');
+            
+            // 设置弹窗标题
+            const fieldTitles = {
+                'nickname': '修改用户昵称',
+                'password': '修改密码'
+            };
+            modalTitle.textContent = fieldTitles[field] || '修改信息';
+
+            // 生成表单内容
+            let formHtml = '';
+            switch(field) {
+                case 'nickname':
+                    formHtml = `
+                        <div class="form-group">
+                            <label class="form-label">新昵称</label>
+                            <input type="text" class="form-input" id="edit-value" value="${userInfo.nickname || ''}" placeholder="请输入新昵称">
+                        </div>
+                    `;
+                    break;
+                case 'password':
+                    formHtml = `
+                        <div class="form-group">
+                            <label class="form-label">新密码</label>
+                            <input type="password" class="form-input" id="edit-value" placeholder="请输入新密码">
+                        </div>
+                        <div class="form-group password-confirm">
+                            <label class="form-label">确认新密码</label>
+                            <input type="password" class="form-input" id="edit-confirm" placeholder="请再次输入新密码">
+                        </div>
+                    `;
+                    break;
+            }
+            modalForm.innerHTML = formHtml;
+
+            // 显示弹窗
+            modal.classList.add('active');
+        }
+
+        // 关闭编辑弹窗
+        function closeEditModal() {
+            const modal = document.getElementById('edit-modal');
+            modal.classList.remove('active');
+            currentEditField = '';
+        }
+
+        // 确认修改
+        async function confirmEdit() {
+            try {
+                const accessToken = sessionStorage.getItem('access_token');
+                if (!accessToken) {
+                    alert('登录已失效，请重新登录');
+                    location.href = "/login";
+                    return;
+                }
+
+                // 获取输入值
+                let value = document.getElementById('edit-value')?.value?.trim();
+                const confirmValue = document.getElementById('edit-confirm')?.value?.trim();
+
+                // 验证
+                if (!value) {
+                    alert('请输入修改内容');
+                    return;
+                }
+
+                // 密码验证
+                if (currentEditField === 'password') {
+                    if (value !== confirmValue) {
+                        alert('两次输入的密码不一致');
+                        return;
+                    }
+                }
+
+                // 构建请求数据
+                const postData = {};
+                postData[currentEditField] = value;
+
+                // 发送修改请求
+                const response = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/update`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                const data = await response.json();
+                if (data.code === 1) {
+                    alert('修改成功');
+                    // 更新本地缓存
+                    userInfo[currentEditField] = value;
+                    // 刷新页面显示
+                    if (currentEditField !== 'password') {
+                        document.getElementById(`${currentEditField}-value`).textContent = value || '未设置';
+                    }
+                    // 关闭弹窗
+                    closeEditModal();
+                } else {
+                    alert(data.message || '修改失败');
+                }
+            } catch (error) {
+                console.error('修改信息失败:', error);
+                alert('修改信息失败，请重试');
+            }
+        }
+        
+        // 退出登录函数
+        async function logout() {
+            try {
+                const accessToken = sessionStorage.getItem('access_token');
+                if (!accessToken) {
+                    sessionStorage.clear();
+                    location.href = `/${ADMIN_ROUTE}/login`;
+                    return;
+                }
+                
+                // 调用后端退出接口
+                await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/logout`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+                
+                // 清除本地存储
+                sessionStorage.clear();
+                
+                alert("已退出登录");
+                location.href = `/${ADMIN_ROUTE}/login`;
+            } catch (error) {
+                console.error('退出失败:', error);
+                sessionStorage.clear();
+                alert("已退出登录");
+                location.href = `/${ADMIN_ROUTE}/login`;
+            }
+        }
+
+        // 注销用户（账号注销）
+        async function accountCancellation() {
+            // 1. 二次确认，防止误触
+            if (!confirm("⚠️  确定要注销账号吗？此操作不可逆，所有数据将被清空！")) {
+                return;
+            }
+
+            // 2. 获取令牌
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert("登录已失效，请重新登录");
+                location.href = `/${ADMIN_ROUTE}/login`;
+                return;
+            }
+
+            try {
+                // 3. 发送注销请求（自动携带令牌）
+                const response = await fetch(`${API_BASE}/api/${ADMIN_ROUTE}/delete`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.code === 1) {
+                    alert("✅ 账号注销成功！");
+                    
+                    // 4. 清除本地登录信息
+                    sessionStorage.clear();
+                    
+                    // 5. 跳回登录页
+                    location.href = `/${ADMIN_ROUTE}/login`;
+                } else {
+                    alert("❌ 注销失败：" + (data.msg || "未知错误"));
+                }
+
+            } catch (error) {
+                console.error("注销异常：", error);
+                alert("网络异常，注销失败");
+            }
+        }
+    </script>
+</body>
+</html>

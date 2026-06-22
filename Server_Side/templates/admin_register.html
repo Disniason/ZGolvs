@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 背单词系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2fee2f 0%, #32ac06 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-group input {
+            flex: 1;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-code {
+            background: #4CAF50;
+            white-space: nowrap;
+        }
+        
+        .btn-code:hover:not(:disabled) {
+            background: #45a049;
+        }
+        
+        .btn-verify {
+            background: #2196F3;
+        }
+        
+        .btn-register {
+            width: 100%;
+            margin-top: 10px;
+            padding: 14px;
+            font-size: 16px;
+        }
+        
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .separator {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .separator span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📝 注册账号</h2>
+        
+        <div class="form-group">
+            <label>📧 邮箱地址</label>
+            <div class="input-group">
+                <input type="email" id="email" placeholder="请输入邮箱" autocomplete="off">
+                <button id="sendCodeBtn" class="btn-code">发送验证码</button>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>🔐 验证码</label>
+            <div class="input-group">
+                <input type="text" id="code" placeholder="请输入6位验证码" maxlength="6">
+                <button id="verifyBtn" class="btn-verify">验证</button>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>🔒 设置密码</label>
+            <input type="password" id="pw1" placeholder="请输入密码（至少6位）" disabled>
+            <div class="hint">💡 密码长度至少6位，建议包含字母和数字</div>
+        </div>
+        
+        <div class="form-group">
+            <label>✅ 确认密码</label>
+            <input type="password" id="pw2" placeholder="请再次输入密码" disabled>
+        </div>
+        
+        <button id="registerBtn" class="btn-register" disabled>完成注册</button>
+        
+        <div id="message"></div>
+        
+    </div>
+    
+    <script>
+        // ========== API 配置 ==========
+        // 如果通过后端访问（http://...:5000/register），使用空字符串
+        // 如果直接打开HTML文件，需要设置完整地址
+        const API_BASE = '';
+        // 如果需要指定后端地址，取消注释并修改：
+        // const API_BASE = 'http://172.28.97.188:5000';
+        // ==============================
+        
+        let canSetPw = false;
+        let countdown = 0;
+        let timer = null;
+        const ADMIN_ROUTE = "{{ admin_route }}";
+        console.log("当前管理员路由：", ADMIN_ROUTE);
+        
+        // DOM 元素
+        const emailInput = document.getElementById('email');
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+        const codeInput = document.getElementById('code');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const pw1Input = document.getElementById('pw1');
+        const pw2Input = document.getElementById('pw2');
+        const registerBtn = document.getElementById('registerBtn');
+        const messageDiv = document.getElementById('message');
+        
+        // 显示消息
+        function showMessage(text, type) {
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            setTimeout(() => {
+                if (messageDiv.className === `message ${type}`) {
+                    messageDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        messageDiv.className = '';
+                        messageDiv.textContent = '';
+                        messageDiv.style.opacity = '1';
+                    }, 300);
+                }
+            }, 3000);
+        }
+        
+        // 更新发送按钮状态
+        function updateSendButton() {
+            if (countdown > 0) {
+                sendCodeBtn.disabled = true;
+                sendCodeBtn.textContent = `${countdown}秒后重试`;
+            } else {
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = '发送验证码';
+            }
+        }
+        
+        // 开始倒计时
+        function startCountdown() {
+            if (timer) clearInterval(timer);
+            countdown = 600;
+            updateSendButton();
+            
+            timer = setInterval(() => {
+                countdown--;
+                updateSendButton();
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    timer = null;
+                    updateSendButton();
+                }
+            }, 1000);
+        }
+        
+        // 发送验证码
+        async function sendCode() {
+            let email = emailInput.value.trim();
+            if (!email) {
+                showMessage('❌ 请输入邮箱', 'error');
+                return;
+            }
+            if (!email.includes('@')) {
+                showMessage('❌ 请输入有效的邮箱地址', 'error');
+                return;
+            }
+            
+            sendCodeBtn.disabled = true;
+            sendCodeBtn.textContent = '发送中...';
+            
+            try {
+                const url = `${API_BASE}/api/${ADMIN_ROUTE}/send-code`;
+                console.log('请求地址:', url);
+                
+                let res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+                let data = await res.json();
+                
+                if (data.code === 1) {
+                    showMessage(`✅ ${data.msg}`, 'success');
+                    startCountdown();
+                } else {
+                    showMessage(`❌ ${data.msg}`, 'error');
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.textContent = '发送验证码';
+                }
+            } catch (error) {
+                console.error('请求错误:', error);
+                showMessage(`❌ 网络错误: ${error.message}`, 'error');
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = '发送验证码';
+            }
+        }
+        
+        // 验证验证码
+        async function verifyCode() {
+            let email = emailInput.value.trim();
+            let code = codeInput.value.trim();
+            
+            if (!email) {
+                showMessage('❌ 请先输入邮箱', 'error');
+                return;
+            }
+            if (!code) {
+                showMessage('❌ 请输入验证码', 'error');
+                return;
+            }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = '验证中...';
+            
+            try {
+                const url = `${API_BASE}/api/${ADMIN_ROUTE}/verify-code`;
+                let res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, code })
+                });
+                let data = await res.json();
+                showMessage(data.msg, data.code === 1 ? 'success' : 'error');
+                
+                if (data.code === 1) {
+                    canSetPw = true;
+                    pw1Input.disabled = false;
+                    pw2Input.disabled = false;
+                    registerBtn.disabled = false;
+                    showMessage('✅ 验证码验证成功，请设置密码', 'success');
+                }
+            } catch (error) {
+                console.error('验证错误:', error);
+                showMessage('❌ 验证失败，请稍后重试', 'error');
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = '验证';
+            }
+        }
+        
+        // 检查密码是否匹配
+        function checkPasswords() {
+            if (!canSetPw) return;
+            const pw1 = pw1Input.value;
+            const pw2 = pw2Input.value;
+            if (pw1 && pw2 && pw1 !== pw2) {
+                showMessage('⚠️ 两次输入的密码不一致', 'error');
+            }
+        }
+        
+        // 完成注册
+        async function finishRegister() {
+            let email = emailInput.value.trim();
+            let pw1 = pw1Input.value;
+            let pw2 = pw2Input.value;
+            
+            if (!canSetPw) {
+                showMessage('❌ 请先验证验证码', 'error');
+                return;
+            }
+            
+            if (!pw1 || !pw2) {
+                showMessage('❌ 请填写密码', 'error');
+                return;
+            }
+            
+            if (pw1 !== pw2) {
+                showMessage('❌ 两次密码不一致', 'error');
+                return;
+            }
+            
+            if (pw1.length < 6) {
+                showMessage('❌ 密码长度至少6位', 'error');
+                return;
+            }
+            
+            registerBtn.disabled = true;
+            registerBtn.textContent = '注册中...';
+            
+            try {
+                const url = `${API_BASE}/api/${ADMIN_ROUTE}/finish-register`;
+                let res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: email,
+                        encrypted_password: pw1
+                    })
+                });
+                
+                let data = await res.json();
+                showMessage(data.msg, data.code === 1 ? 'success' : 'error');
+                
+                if (data.code === 1) {
+                    setTimeout(() => {
+                        location.href = `/${ADMIN_ROUTE}/login`;
+                    }, 1500);
+                } else {
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = '完成注册';
+                }
+            } catch (err) {
+                console.error('注册错误:', err);
+                showMessage("注册失败：" + err.message, 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = '完成注册';
+            }
+        }
+        
+        // 事件监听
+        sendCodeBtn.addEventListener('click', sendCode);
+        verifyBtn.addEventListener('click', verifyCode);
+        registerBtn.addEventListener('click', finishRegister);
+        pw1Input.addEventListener('input', checkPasswords);
+        pw2Input.addEventListener('input', checkPasswords);
+        
+        // 回车键支持
+        emailInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendCode();
+        });
+        codeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyCode();
+        });
+        pw2Input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !registerBtn.disabled) finishRegister();
+        });
+    </script>
+</body>
+</html>
